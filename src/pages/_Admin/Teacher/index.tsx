@@ -85,7 +85,7 @@ const TeacherPage = () => {
     {
       title: 'Lớp chủ nhiệm hiện tại',
       render: (_, record: TeacherType) => {
-        return dataClass?.find(o => o.GiaoVien__c === record.Id)?.Name;
+        return dataClass?.find(o => o?.GiaoVien__c === record.Id)?.Name;
       }
     },
     {
@@ -229,7 +229,7 @@ const TeacherPage = () => {
 
       </Filter>
       <div style={{margin: '12px'}}></div>
-      <DataTable bordered={false} columns={columns} dataSource={dataTeacher?.sort((o1, o2) => o2.MaGiaoVien__c.localeCompare(o1.MaGiaoVien__c))}/>
+      <DataTable bordered={false} columns={columns} dataSource={dataTeacher?.sort((o1, o2) => o2?.MaGiaoVien__c.localeCompare(o1?.MaGiaoVien__c))}/>
 
       {/* Edit */}
 

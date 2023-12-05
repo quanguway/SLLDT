@@ -18,10 +18,22 @@ const saveAbsenceParent = (body: TAbsenceBody) => {
     body: body as any
   });
 };
+
+
+const Absenedelete = (id: string) => {
+  return fetch({
+    method: 'post',
+    url: '/letter/delete',
+    body: {
+      id
+    }
+  });
+};
 // api here
 const apisAbsence = {
   getAbsenceParent,
-  saveAbsenceParent
+  saveAbsenceParent,
+  Absenedelete
 };
 
 export default apisAbsence;

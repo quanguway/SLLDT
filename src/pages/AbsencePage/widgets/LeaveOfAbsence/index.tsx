@@ -12,6 +12,7 @@ import apisAbsence from '../../service/apis';
 import storage from '../../../../utils/sessionStorage';
 import moment from 'moment';
 import ButtonPrimary from '../../../../component/atom/Button/ButtonPrimary';
+import absenceAction from '../../service/actions';
 
 const { RangePicker } = DatePicker;
 
@@ -28,6 +29,7 @@ const LeaveOfAbsence = () => {
   // },[form.getFieldValue('time_absence')]);
   
   const handleRangPicker = (values: any) => {
+    if(!values?.[0] || !values?.[1]) return;
     setListLesion(getDatesBetween(values[0], values[1]));
   };
 
@@ -43,7 +45,10 @@ const LeaveOfAbsence = () => {
       TrangThai__c: 'PENDING'
 
     });
+    dispatch(absenceAction.getAbsenceParent.fetch());
+
     dispatch(uiActions.setLoadingPage(false));
+    form.resetFields();
 
   };
 
@@ -67,7 +72,9 @@ const LeaveOfAbsence = () => {
               alignItems: 'center',
               gap: '8px'
             }} label='Thời gian nghỉ: '>
-              <Form.Item name={'time_absence'}>
+              <Form.Item name={'time_absence'} rules={[
+                {required: true}
+              ]}>
                 <RangePicker 
                     disabledDate={(current) => {
                     const customDate = dayjs().format('YYYY-MM-DD');
@@ -91,7 +98,9 @@ const LeaveOfAbsence = () => {
               </div> : <Empty description='Không có buổi học nào được chọn'/>}
             </FormBlock> */}
             <FormBlock label='Lý do xin nghỉ:'>
-              <Form.Item name={'reason'} >
+              <Form.Item  rules={[
+                {required: true}
+              ]} name={'reason'} >
                 <TextArea rows={4} />
               </Form.Item>
             </FormBlock>

@@ -3,8 +3,9 @@ import { Card, Tabs, TabsProps } from 'antd';
 import LeaveOfAbsence from './widgets/LeaveOfAbsence';
 import ListAbsence from './widgets/ListAbsence';
 import { useAppDispatch } from '../../store/hooks';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import absenceAction from './service/actions';
+import absenceSelectors from './service/selectors';
 
   
 export enum EAbsenceStatus {
@@ -30,30 +31,38 @@ const AbsencePage = () => {
     },
     {
       key: '2',
-      label: 'Phép chờ duyệt',
+      label: 'Phép chờ xác nhận',
       children: <ListAbsence />,
     },
     {
       key: '3',
-      label: 'Phép đã được duyệt',
+      label: 'Phép đã xác nhận',
       children: <ListAbsence isAccept/>,
     },
   ];
 
-  const info = [
+  const absenceParents = absenceSelectors.getAbsenceParent();
+
+  const info = useMemo(() => {
+
+    const absenceParentXacNhan =  absenceParents.filter(o => o.TrangThai__c === EAbsenceStatus.ACCEPT);
+    const absenceParentChauXacNhan =  absenceParents.filter(o => o.TrangThai__c !== EAbsenceStatus.ACCEPT);
+
+    return [
     {
       label: 'Tổng số đơn nghỉ',
-      value: 10
+      value: absenceParentChauXacNhan.length + absenceParentXacNhan.length
     },
     {
-      label: 'Tổng số ngày đã nghỉ',
-      value: 2
+      label: 'Tổng số đơn đã xác nhận',
+      value: absenceParentXacNhan.length
     },
     {
-      label: 'Tổng số ngày chưa duyệt',
-      value: 8
+      label: 'Tổng số đơn chưa xác nhận',
+      value: absenceParentChauXacNhan.length
     }
   ];
+}, [absenceParents]) ;
 
   return (
     <AbsencePageStyled>

@@ -330,7 +330,7 @@ const EvaluationSheetPage = () => {
                       },
                       {
                         value: 'GIUA_HK_2',
-                        label: 'Giữa kì 3',
+                        label: 'Giữa kì 2',
                       },
                       {
                         value: 'CUOI_HK_2',

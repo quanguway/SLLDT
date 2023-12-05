@@ -7,23 +7,27 @@ import absenceSelectors from '../../service/selectors';
 import moment from 'moment';
 import { EAbsenceStatus } from '../..';
 import apisAbsence from '../../service/apis';
+import { useDispatch } from 'react-redux';
+import absenceAction from '../../service/actions';
 
 const ListAbsence = ({isAccept = false}: {isAccept?: boolean}) => {
 
   const Status = ({status}: {status: EAbsenceStatus}) => {
     switch (status) {
       case EAbsenceStatus.ACCEPT:
-        return <Tag color='green'>Đã duyệt</Tag>;
+        return <Tag color='green'>Đã xác nhận</Tag>;
       case EAbsenceStatus.DELETE:
         return <Tag color='red'>Đã huỷ</Tag>;
       case EAbsenceStatus.PENDING:
-        return <Tag color='yellow'>Đang duyêt</Tag>;
+        return <Tag color='yellow'>Chưa xác nhận</Tag>;
       case EAbsenceStatus.DRAFT:
         return <Tag color='gray'>Nháp</Tag>;
       default:
         return <Tag>Đang gửi</Tag>;
     }
   };
+
+  const dispatch = useDispatch();
 
 
   const columns = !isAccept ? [
@@ -64,15 +68,16 @@ const ListAbsence = ({isAccept = false}: {isAccept?: boolean}) => {
     },
     {
       title: 'Hành động',
-      render: ( record: any) => {
+      render: ( data: any, record: any) => {
+        console.log(record);
+        
         return (
           <ActionTable actions={[
             {
               handle: async () => {
-                await apisAbsence.saveAbsenceParent({
-                  ...record,
-                  TrangThai__c: EAbsenceStatus.DELETE
-                });
+                await apisAbsence.Absenedelete(record?.Id);
+                dispatch(absenceAction.getAbsenceParent.fetch());
+
               },
               icon: <DeleteOutlined />,
               label: 'Huỷ đơn nghỉ',
@@ -127,6 +132,7 @@ const ListAbsence = ({isAccept = false}: {isAccept?: boolean}) => {
     absenceParents.filter(o => o.TrangThai__c !== EAbsenceStatus.ACCEPT);
 
   const data = absenceParent.map(o => ({
+    Id: o.Id,
     student_name: o.HocSinh.Name,
     date_from: o.NgayNghi__c,
     date_to: moment(o.NgayNghi__c).add(o.SoNgayNghi__c, 'day').format('YYYY-MM-DD'),

@@ -49,22 +49,29 @@ const NavLink = () => {
     try{
       dispatch(uiActions.setLoadingPage(true));
 
-      const resClass = await apisClass.getListClass({
+      await apisClass.getListClass({
         year: 2023,
+      }).then((resClass) => {
+
+        console.log(resClass);
+        
+        apisTeacher.getListTeacher().then((resTeacher) => {
+          if(resTeacher?.data?.data) {
+            const class_id = storage.get('class_id');
+            
+            const classData = resClass?.data?.data?.find((o: any) => o.Id  === class_id);
+            
+            setDataTeacher(resTeacher?.data?.data.find((o: any) => o.Id === classData?.GiaoVien__c));
+          }
+        });
+  
       });
 
-      const resTeacher = await apisTeacher.getListTeacher();
+      // const resTeacher = await apisTeacher.getListTeacher();
       // const user_id = storage.get('user_id');
 
 
-      if(resTeacher?.data?.data) {
-        const class_id = storage.get('class_id');
-        
-        const classData = resClass?.data?.data?.find((o: any) => o.Id  === class_id);
-        
-        setDataTeacher(resTeacher?.data?.data.find((o: any) => o.Id === classData.GiaoVien__c));
-      }
-
+      
     } catch(e) {
     } finally {
       dispatch(uiActions.setLoadingPage(false));
