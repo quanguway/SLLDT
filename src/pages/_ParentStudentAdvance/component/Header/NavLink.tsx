@@ -31,9 +31,9 @@ const navItem = [
     label: 'Xin nghỉ phép',
     link: '/app/leave-of-absence'
   },
-  {
-    label: 'Giáo viên'
-  }
+  // {
+  //   label: 'Giáo viên'
+  // }
 ];
 
 const NavLink = () => {
