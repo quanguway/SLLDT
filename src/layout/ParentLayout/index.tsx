@@ -15,16 +15,16 @@ import storage from '../../utils/sessionStorage';
 const ParentLayout = () => {
   const screen = useDetachScreen();
   const classId = storage.get('class_id');
-  useEffect(() => {
-    if(classId && classId !== ''){
-      socket.emit('addParent', {classId: classId});
-    }
-  },[]);
+  // useEffect(() => {
+  //   if(classId && classId !== ''){
+  //     socket.emit('addParent', {classId: classId});
+  //   }
+  // },[]);
 
-  useEffect(() => {
-    socket.on('success-connect', (data) => {
-    });
-  },[socket]);
+  // useEffect(() => {
+  //   socket.on('success-connect', (data) => {
+  //   });
+  // },[socket]);
 
 
 

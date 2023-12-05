@@ -10,22 +10,22 @@ import { useCollapseSidebar } from '../../services/hooks/useCollapseSidebar';
 import { COLOR_PRIMARY } from '../../utils/variables/colors';
 // import { io } from 'socket.io-client';
 import { useEffect } from 'react';
-import storage from '../../utils/sessionStorage';
-import { socket } from '../../utils/socket';
+// import storage from '../../utils/sessionStorage';
+// import { socket } from '../../utils/socket';
 
 
 const AppLayout = () => {
-  const token = storage.get('token');
+  // const token = storage.get('token');
   useEffect(() => {
-    if(token && token !== ''){
-      socket.emit('addTeacher', {senderId: token});
-    }
+    // if(token && token !== ''){
+    //   socket.emit('addTeacher', {senderId: token});
+    // }
   },[]);
 
-  useEffect(() => {
-    socket.on('success-connect', () => {
-    });
-  },[socket]);
+  // useEffect(() => {
+  //   socket.on('success-connect', () => {
+  //   });
+  // },[socket]);
 
   const screen = useDetachScreen();
 

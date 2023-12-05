@@ -1,10 +1,10 @@
 import { BellOutlined } from '@ant-design/icons';
 import { Avatar, Badge, List, Popover } from 'antd';
 import { useEffect, useState } from 'react';
-import { socket } from '../../../utils/socket';
+// import { socket } from '../../../utils/socket';
 import apisNotification from './service/apis';
 import storage from '../../../utils/sessionStorage';
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
 
 const Notification = () => {
 
@@ -29,19 +29,19 @@ const Notification = () => {
   useEffect(() => {
   },[notification]);
 
-  useEffect(() => {
-    socket.on('notify-new-lesson', (data) => {
-      const newNotification = {
-        Name: 'GVCN đã gửi báo bài ' + (data.dataLesson ? 'ngày ' + dayjs(data.dataLesson.SentDay__c ).format('DD/MM/YYYY') : 'mới'),
-        Message__c: '',
-        ExternalID__c: 'LESSON-' + data.classId + '-' +  data.lessonId + '-' + userID,
-        IsSeen__c: false,
-        Type__c: 'LESSON',
-        CreatedDate: new Date()
-      };
-      setNotification([newNotification, ...notification]);
-    });
-  },[socket]);
+  // useEffect(() => {
+  //   socket.on('notify-new-lesson', (data) => {
+  //     const newNotification = {
+  //       Name: 'GVCN đã gửi báo bài ' + (data.dataLesson ? 'ngày ' + dayjs(data.dataLesson.SentDay__c ).format('DD/MM/YYYY') : 'mới'),
+  //       Message__c: '',
+  //       ExternalID__c: 'LESSON-' + data.classId + '-' +  data.lessonId + '-' + userID,
+  //       IsSeen__c: false,
+  //       Type__c: 'LESSON',
+  //       CreatedDate: new Date()
+  //     };
+  //     setNotification([newNotification, ...notification]);
+  //   });
+  // },[socket]);
 
   const [open, setOpen] = useState<boolean>();
 

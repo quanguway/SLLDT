@@ -23,9 +23,8 @@ import localeData from 'dayjs/plugin/localeData';
 import weekday from 'dayjs/plugin/weekday';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import weekYear from 'dayjs/plugin/weekYear';
-
 import ButtonImport from './widgets/ButtonImport';
-import { socket } from '../../utils/socket';
+// import { socket } from '../../utils/socket';
 import 'react-quill/dist/quill.snow.css';
 import InputTextEditor from '../../component/atom/Input/InputTextEditor';
 import { useAppDispatch } from '../../store/hooks';
@@ -190,7 +189,7 @@ const ReportLesionPage = () => {
 
       if(data) {
         if(data[0].Status__c === 'Accepted'){
-          socket.emit('add-lesson-complete', {classId, lessonId: data[0].Id, dataLesson: data[0]});
+          // socket.emit('add-lesson-complete', {classId, lessonId: data[0].Id, dataLesson: data[0]});
         }
         setOpen(false);
         await dispatch(lesionActions.getListLesion.fetch());
