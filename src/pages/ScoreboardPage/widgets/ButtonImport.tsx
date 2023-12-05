@@ -89,6 +89,8 @@ const ButtonImportScore = () => {
             requestBody: {
               ...data
             }
+          }).then(() => {
+            setOpen(false);
           });
         }
           // setOpen(false);
@@ -98,6 +100,8 @@ const ButtonImportScore = () => {
         dispatch(uiActions.setLoadingPage(false));
       } finally {
         dispatch(uiActions.setLoadingPage(false));
+        
+
       }
     }, [data]);
 
@@ -201,11 +205,11 @@ const ButtonImportScore = () => {
 
 
                   // if(Number(lesion_index) == 0) {
-                    console.log(lesions[lesion_index]);
-                    console.log(lesion_index);
-                    console.log(getRow(EColScore.diemKTDK));
-                    console.log(scoresInfo);
-                    console.log(scoresInfo[getRow(EColScore.diemKTDK)]);
+                    // console.log(lesions[lesion_index]);
+                    // console.log(lesion_index);
+                    // console.log(getRow(EColScore.diemKTDK));
+                    // console.log(scoresInfo);
+                    // console.log(scoresInfo[getRow(EColScore.diemKTDK)]);
                     
 
                   // }
@@ -235,7 +239,6 @@ const ButtonImportScore = () => {
 
             setData(result);            
 
-      
           };
           reader.readAsArrayBuffer(file);
         },
