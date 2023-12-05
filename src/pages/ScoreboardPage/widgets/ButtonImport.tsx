@@ -137,7 +137,7 @@ const ButtonImportScore = () => {
 
             rangeInfo.s.r = 8;
             rangeInfo.s.c = 4;
-            rangeInfo.e.c = 31;
+            rangeInfo.e.c = 32;
 
             const scoresInfos = utils.sheet_to_json(worksheet, {range: rangeInfo});
 
@@ -198,6 +198,18 @@ const ButtonImportScore = () => {
                   const getRow = (col: EColScore) => {
                     return `${col}${ Number(lesion_index) > 0 ? '_' + lesion_index : '' }`;
                   };
+
+
+                  // if(Number(lesion_index) == 0) {
+                    console.log(lesions[lesion_index]);
+                    console.log(lesion_index);
+                    console.log(getRow(EColScore.diemKTDK));
+                    console.log(scoresInfo);
+                    console.log(scoresInfo[getRow(EColScore.diemKTDK)]);
+                    
+
+                  // }
+                  
                   
                   scores.push({
                     subjectType: 'SUBJECT',
