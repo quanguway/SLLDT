@@ -92,7 +92,7 @@ const LoginPage = () => {
         onSubmit={onSubmit}
         renderButton={<ButtonLoginStyled htmlType='submit' label='Login'/>}>
 
-        <InputText name='phone' placeholder='Nhập số điện thoại' label={'Số điện thoại'}/>
+        <InputText name='phone' placeholder='Nhập số điện thoại / Mã đăng nhập' label={'Số điện thoại / Mã đăng nhập'}/>
         <InputTextPassword name='password' placeholder='Nhập mật khẩu' label={'Mật Khẩu'} />
 
         </FormLayout>

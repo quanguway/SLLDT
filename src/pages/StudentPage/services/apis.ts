@@ -17,6 +17,19 @@ const getListStudent = () => {
     getListStudent();
   });
 };
+const getListStudentAll = () => {
+
+  return fetch({
+    method: 'get',
+    url: '/student',
+    configs: {
+      ...configTimeout
+    }
+    // params: { ...params, per_page: 100 },
+  }).catch(() => {
+    getListStudent();
+  });
+};
 
 const getListStudentByClass = (class_id: string, year: string) => {
 
@@ -52,7 +65,8 @@ const getDetailStudent = (id: string) => {
 const apisStudent = {
   getListStudent,
   getDetailStudent,
-  getListStudentByClass
+  getListStudentByClass,
+  getListStudentAll
 };
 
 export default apisStudent;

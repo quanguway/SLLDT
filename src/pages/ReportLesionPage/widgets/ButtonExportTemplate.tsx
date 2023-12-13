@@ -15,7 +15,7 @@ const ButtonExportTemplate = () => {
         currentTableRef={exportTableRef.current}
         > */}
         {/* <Button size='small' type='default' icon={<DownloadOutlined />}> <a>Download</a> </Button> */}
-          <Button size='small' type='default' icon={<DownloadOutlined />}><a href={template} download="template_bao_bai">Download</a></Button>
+          <Button size='small' type='default' icon={<DownloadOutlined />}><a href={template} download="template_bao_bai">Tải xuống</a></Button>
 
         {/* </DownloadTableExcel> */}
         {/* <table style={{

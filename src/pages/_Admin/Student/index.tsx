@@ -1,32 +1,41 @@
 import { styled } from 'styled-components';
 import { EyeOutlined } from '@ant-design/icons';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ColumnsType } from 'antd/es/table';
 import { useAppDispatch } from '../../../store/hooks';
 import { getGender } from '../../../utils/unit';
 import ActionTable from '../../../component/molecule/DataTable/ActionTables';
 import Filter from '../../../component/template/Filter';
-import InputSearchText from '../../../component/atom/Input/InputSearch';
 import DataTable from '../../../component/molecule/DataTable';
 import { ClassType, DrawerStyled } from '../Class';
 import uiActions from '../../../services/UI/actions';
 import apisClass from '../../ClassPage/services/apis';
-import { Form, Input } from 'antd';
-import InputSelect from '../../../component/atom/Input/InputSelect';
+import { Form, Input, Radio, Select, message } from 'antd';
 import apisStudent from '../../StudentPage/services/apis';
-import { range } from 'lodash';
 import moment from 'moment';
+import InputText from '../../../component/atom/Input/InputText';
+import FormLayout from '../../../component/organism/FormLayout';
+import ModalButton from '../../../component/organism/ModalButton';
+import InputDatePicker from '../../../component/atom/Input/InputDatePicker';
+import apisStudentAdmin from './services/apis';
+import apisParent from '../Parent/services/apis';
 
 const StudentAdminPage = () => {
 
   const dispatch = useAppDispatch();
-  const [dataClass, setDataClass] = useState<ClassType[]>();
+  const [, setDataClass] = useState<ClassType[]>();
   const [dataStudent, setDataStudent] = useState<any[]>();
-  const [classFilter, setClassFilter] = useState<string>();
-  const [yearFilter, setYearFilter] = useState<string>();
+  const [classFilter] = useState<string>();
+  const [yearFilter] = useState<string>();
+  const [gender, setGender] = useState<boolean>(true);
+  const [parentData, setParentData] = useState<any[]>();
+
+
 
   const [detail, setDetail] = useState<any>();
+  const [open, setOpen] = useState(false);
+
 
   // const data = [
   //   {
@@ -63,6 +72,12 @@ const StudentAdminPage = () => {
         year: 2023,
       });
 
+      const parrentRes = await apisParent.getListParent();
+
+      if(parrentRes?.data?.data) {
+        setParentData(parrentRes?.data?.data);
+      }
+
       // const resTeacher = await apisTeacher.getListTeacher();
 
       if(res?.data?.data) {
@@ -82,17 +97,17 @@ const StudentAdminPage = () => {
   };
 
   const yearNow = moment().year();
-  const yearOption = range(0,50).map(o => ({
-    value: yearNow - o,
-    label: (yearNow - o).toString()
-  }));
+  // const yearOption = range(0,50).map(o => ({
+  //   value: yearNow - o,
+  //   label: (yearNow - o).toString()
+  // }));
 
-  const classOption = useMemo(() => {
-    return dataClass?.map(o => ({
-      label: o.Name,
-      value: o.Id,
-    }));
-  }, [dataClass]);
+  // const classOption = useMemo(() => {
+  //   return dataClass?.map(o => ({
+  //     label: o.Name,
+  //     value: o.Id,
+  //   }));
+  // }, [dataClass]);
 
   useEffect(() => {
     fetchData();
@@ -178,18 +193,85 @@ const StudentAdminPage = () => {
     <StudentAdminPageStyled>
       <h1 style={{margin: '12px 0px'}}>Học sinh</h1>
       <Filter>
-      <Form.Item name={'yearFilter'}>
+      {/* <Form.Item name={'yearFilter'}>
         <InputSelect defaultValue={moment().year()} onChange={value => setYearFilter(value)} options={yearOption}/>
       </Form.Item>
       <Form.Item name={'classFilter'}>
         <InputSelect defaultValue={'1A'} onChange={value => setClassFilter(value)} options={classOption}/>
       </Form.Item>
 
-      <InputSearchText />
+      <InputSearchText /> */}
         {/* <InputSelect value={classId} options={[{
           value: classId,
           label: className,
         }]} /> */}
+        <ModalButton
+          state={[open, setOpen]}
+          // isOpen={open}
+          title={'Học sinh'}
+          label='Thêm học sinh'
+        >
+          <FormLayout<any>
+              onSubmit={async (value) => {
+                dispatch(uiActions.setLoadingPage(true));
+                console.log(value);
+                
+                try {
+                  await apisStudentAdmin.saveStudent({
+                    // ...value,
+                    Name: value.Name,
+                    GioiTinh__c: gender,
+                    NgaySinh__c: value.NgaySinh__c.format('YYYY-MM-DD'),
+                    parent: value.Parent__c.map((o: string) => ({
+                      Parent__c: o
+                    }))
+                  });
+                  fetchData();
+                  setOpen(false);
+
+                } catch (e) {
+                  console.log(e);
+                  
+                  message.error('Số điện thoại hoặc emil bị trùng. Xin vui lòng nhập lại');
+                  
+                } finally {
+                  dispatch(uiActions.setLoadingPage(false));
+                }
+              }}
+            >
+            <InputText required name='Name' label='Tên học sinh'/>
+
+            <Form.Item required name={'NgaySinh__c'} label='Ngày sinh'>
+              <InputDatePicker  />
+            </Form.Item>
+
+            <Form.Item name={'GioiTinh__c'} label='Giới tính'>
+              <Radio.Group  onChange={(e) => setGender(e.target.value)} value={gender}>
+                <Radio value={true}>Nam</Radio>
+                <Radio value={false}>Nữ</Radio>
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item name={'Parent__c'} label='Phụ huynh'>
+              <Select
+                mode="multiple"
+                size={'large'}
+                placeholder="Please select"
+                defaultValue={[]}
+                // onChange={handleChange}
+                style={{ width: '100%' }}
+                options={(parentData ?? []).map(o => ({
+                  label: o.Name,
+                  value: o.Id
+                }))}
+              />
+            </Form.Item>
+
+            {/* <InputTextPassword required name={'Password__c'} label='Mật khẩu'/> */}
+            {/* <Form.Item label='Lớp chủ nhiệm'>
+              <InputSelect/>
+            </Form.Item> */}
+          </FormLayout>
+        </ModalButton>
       </Filter>
       <div style={{margin: '12px'}}></div>
 

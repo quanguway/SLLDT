@@ -32,11 +32,6 @@ const updateLetter = (body : any) => {
     method: 'post',
     url: 'letter/save',
     body,
-    configs: {
-      ...configTimeout
-    }
-  }).catch(() => {
-    updateLetter(body);
   });
 };
 

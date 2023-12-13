@@ -193,7 +193,7 @@ const ParentAdminPage = () => {
                     BirthDay__c: value.BirthDay__c.format('YYYY-MM-DD'),
                     Password__c: value.Phone__c.replaceAll('-', '')
                   });
-                  window.location.reload();
+                  fetchData();
 
                 } catch (e) {
                   message.error('Số điện thoại hoặc emil bị trùng. Xin vui lòng nhập lại');
@@ -260,7 +260,7 @@ const ParentAdminPage = () => {
                     Email__c: value.Email__c === detail?.User.Email__c ? undefined : value.Email__c,
                     Password__c: detail?.User.Phone__c
                   });
-                  window.location.reload();
+                  fetchData();
 
                 } catch (e) {
                   message.error('Số điện thoại hoặc emil bị trùng. Xin vui lòng nhập lại');

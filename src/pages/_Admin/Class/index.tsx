@@ -2,11 +2,11 @@ import { styled } from 'styled-components';
 import DataTable from '../../../component/molecule/DataTable';
 import Filter from '../../../component/template/Filter';
 import ActionTable from '../../../component/molecule/DataTable/ActionTables';
-import { EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { useAppDispatch } from '../../../store/hooks';
 import apisClass from '../../ClassPage/services/apis';
 import uiActions from '../../../services/UI/actions';
-import { Drawer, Form, Input } from 'antd';
+import { Drawer, Form, Input, Modal, Select, message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { ColumnsType } from 'antd/es/table';
 import apisTeacher from '../Teacher/services/apis';
@@ -15,6 +15,9 @@ import FormLayout from '../../../component/organism/FormLayout';
 import InputText from '../../../component/atom/Input/InputText';
 import InputSelect from '../../../component/atom/Input/InputSelect';
 import moment from 'moment';
+import apisclassAdmin from './services/apis';
+import apisStudent from '../../StudentPage/services/apis';
+import { COLOR_YELLOW_DARK } from '../../../utils/variables/colors';
 
 
 export type ClassType = {
@@ -56,12 +59,22 @@ const ClassPage= () => {
 
   const [dataClass, setDataClass] = useState<ClassType[]>();
   const [dataTeacher, setDataTeacher] = useState<TeacherType[]>();
+  const [dataStudent, setDataStudent] = useState<any[]>();
   const [detail, setDetail] = useState<any>();
+  const [editDetail, setEditDetail] = useState<any>();
+  const [formEdit] = Form.useForm();
 
-  const teacherOption = useMemo(() => dataTeacher?.map(teacher => ({
+  console.log(dataStudent);
+  
+
+  const teacherOption = useMemo(() => {
+
+    if(!dataTeacher) return [];
+
+  return (dataTeacher ?? [])?.map(teacher => ({
     label: teacher.Name,
     value: teacher.Id
-  })),[dataTeacher]); 
+  }));},[dataTeacher]); 
 
   const columns : ColumnsType<any> = [
     {
@@ -100,6 +113,12 @@ const ClassPage= () => {
               label: 'Xem chi tiết',
               color: '#1890ff'
             },
+            {
+              handle: () => setEditDetail(item),
+              icon: <EditOutlined />,
+              label: 'Edit',
+              color: COLOR_YELLOW_DARK
+            },
           ]}/>
         );
       },
@@ -110,19 +129,41 @@ const ClassPage= () => {
     try{
       dispatch(uiActions.setLoadingPage(true));
 
-      const res = await apisClass.getListClass({
+      await apisClass.getListClass({
         year: 2023,
+      }).then(res => {
+        console.log(res);
+        
+        setDataClass(res?.data?.data);
       });
+
+      const resStudent = await apisStudent.getListStudentAll();
+
+      // const resTeacher = await apisTeacher.getListTeacher();
+      console.log(resStudent);
+      
+      if(resStudent?.data?.data) {
+        setDataStudent(resStudent.data.data);
+      }
 
       const resTeacher = await apisTeacher.getListTeacher();
 
-      if(res?.data?.data) {
-        setDataClass(res.data.data);
-      }
+      // if(res?.data?.data) {
+      //   setDataClass(res.data.data);
+      // }
 
       if(resTeacher?.data?.data) {
         setDataTeacher(resTeacher?.data?.data);
       }
+
+      // await apisClass.getListClass({
+      //   year: 2023,
+      // }).then(res => {
+      //   console.log(res);
+        
+      //   setDataClass(res?.data?.data);
+      // });
+      
 
     } catch(e) {
       // message.error('Đã có lỗi xảy ra');
@@ -131,6 +172,34 @@ const ClassPage= () => {
 
     }
   };
+
+  console.log(editDetail);
+  console.log(dataClass);
+  
+  
+
+  useEffect(() => {
+    if(!editDetail?.Id) return;
+    console.log('???');
+    
+    dispatch(uiActions.setLoadingPage(true));
+    apisStudent.getListStudentByClass(editDetail.Id, moment().get('year').toString()).then((values) => {
+      console.log(values);
+      
+      formEdit.setFieldsValue({
+        Id: editDetail.Id,
+        Name: editDetail.Name,
+        GiaoVien__c: editDetail.GiaoVien__c,
+        // Status__c: 'Active',
+        // SchoolYear__c: moment().get('year'),
+        Student__c: values?.data.data?.[0]?.Student?.map((o: any) => (o.Id))
+      });
+
+      dispatch(uiActions.setLoadingPage(false));
+
+    });
+
+  }, [editDetail]);
 
   useEffect(() => {
     fetchData();
@@ -159,20 +228,124 @@ const ClassPage= () => {
           label='Thêm lớp học'
         >
           <FormLayout<any>
-              onSubmit={() => {
-                
+              onSubmit={ async (values) => {
+                try {
+                  dispatch(uiActions.setLoadingPage(true));
+
+                  await apisclassAdmin.saveclass({
+                    Name: values.Name,
+                    GiaoVien__c: values.GiaoVien__c,
+                    Status__c: 'Active',
+                    SchoolYear__c: moment().get('year'),
+                    hocsinh: values.Student__c.map((o: string) => ({
+                      HocSinh__c: o
+                    }))
+                  });
+
+                  fetchData();
+                } catch(e) {
+
+                } finally {
+                  dispatch(uiActions.setLoadingPage(false));
+
+                }
               }}
             >
             {/* <h2>Lớp học</h2> */}
-            <InputText label={'Tên lớp học'} />
-            <Form.Item label='Giáo viên chủ nhiệm'>
+            <InputText name={'Name'} label={'Tên lớp học'} />
+            <Form.Item name={'GiaoVien__c'} label='Giáo viên chủ nhiệm'>
               <InputSelect options={teacherOption} />
+            </Form.Item>
+            <Form.Item name={'Student__c'} label='Học sinh'>
+              <Select
+                mode="multiple"
+                size={'large'}
+                // placeholder=""
+                defaultValue={[]}
+                // onChange={handleChange}
+                style={{ width: '100%' }}
+                options={(dataStudent ?? []).map(o => ({
+                  label: o.Name,
+                  value: o.Id
+                }))}
+              />
             </Form.Item>
           </FormLayout>
         </ModalButton>
       </Filter>
       <div style={{margin: '12px'}}></div>
       <DataTable bordered={false} columns={columns} dataSource={dataTable}/>
+
+      <ModalStyled 
+        footer={null}
+        forceRender
+        centered
+          onCancel={() => setEditDetail(null)}
+          open={!!editDetail}
+          title={''}
+        >
+          <FormLayout<any>
+              form={formEdit}
+              onSubmit={async (values) => {
+                dispatch(uiActions.setLoadingPage(true));
+                console.log(values);
+                console.log({
+                  Id: editDetail.Id,
+                  Name: values.Name,
+                  GiaoVien__c: values.GiaoVien__c,
+                  Status__c: 'Active',
+                  SchoolYear__c: moment().get('year'),
+                  hocsinh: values.Student__c.map((o: string) => ({
+                    Hocsinh__c: o
+                  }))
+                });
+                
+                try {
+                  await apisclassAdmin.saveclass({
+                    Id: editDetail.Id,
+                    Name: values.Name,
+                    GiaoVien__c: values.GiaoVien__c,
+                    Status__c: 'Active',
+                    SchoolYear__c: moment().get('year'),
+                    hocsinh: values.Student__c.map((o: string) => ({
+                      HocSinh__c: o
+                    }))
+                  });
+                  fetchData();
+
+                } catch (e) {
+                  message.error('Có lỗi xảy ra');
+                  
+                } finally {
+                  dispatch(uiActions.setLoadingPage(false));
+                }
+              }}
+            >
+            <InputText name={'Name'} label={'Tên lớp học'} />
+            <Form.Item name={'GiaoVien__c'} label='Giáo viên chủ nhiệm'>
+              <InputSelect options={teacherOption} />
+            </Form.Item>
+            <Form.Item name={'Student__c'} label='Học sinh'>
+              <Select
+                mode="multiple"
+                size={'large'}
+                // placeholder=""
+                defaultValue={[]}
+                // onChange={handleChange}
+                style={{ width: '100%' }}
+                options={(dataStudent ?? []).map(o => ({
+                  label: o.Name,
+                  value: o.Id
+                }))}
+              />
+            </Form.Item>
+            {/* <InputTextPassword required name={'Password__c'} label='Mật khẩu'/> */}
+            {/* <Form.Item label='Lớp chủ nhiệm'>
+              <InputSelect/>
+            </Form.Item> */}
+          </FormLayout>
+      </ModalStyled>
+
 
       <DrawerStyled
         placement='right'
@@ -218,5 +391,12 @@ const ClassPageStyled = styled.div`
 export const DrawerStyled = styled(Drawer)`
   .ant-input {
     color: black
+  }
+`;
+
+const ModalStyled = styled(Modal)`
+  .ant-modal-title {
+    font-size: 24px;
+    text-align: center;
   }
 `;

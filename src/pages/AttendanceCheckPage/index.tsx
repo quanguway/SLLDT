@@ -1,4 +1,4 @@
-import {  CheckCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import {  CheckCircleOutlined, CloseCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import DataTable from '../../component/molecule/DataTable';
 import ActionTable from '../../component/molecule/DataTable/ActionTables';
 import { styled } from 'styled-components';
@@ -210,12 +210,12 @@ const AttendanceCheckPage = () => {
     }
   };
 
-  const updateLetter = async (id : string) => {
+  const updateLetter = async (id : string, status: string) => {
     try {
       await dispatch(uiActions.setLoadingPage(true));
      await apisLetterTeacher.updateLetter(
         {
-          TrangThai__c: 'ACCEPT',
+          TrangThai__c: status,
           Id: id
         }
       );
@@ -278,11 +278,14 @@ const AttendanceCheckPage = () => {
       width: 100,
       align: 'center' as const,
       render: (value) => {
-        return (
-          value === 'PENDING' 
-          ? <Tag color='yellow'>Chờ duyệt</Tag> 
-          : value === 'ACCEPT' && <Tag color='green'>Đã duyệt</Tag>
-        );
+        if (value === 'PENDING') 
+          return <Tag color='yellow'>Chờ duyệt</Tag>;
+        else if (value === 'DRAFT')
+          return <Tag color='red'>Từ chối</Tag>;
+        else if (value === 'ACCEPT')
+          return <Tag color='green'>Đã duyệt</Tag>;
+        else
+          return <Tag color='green'>Đã duyệt</Tag>;
       }
     },
     {
@@ -296,11 +299,19 @@ const AttendanceCheckPage = () => {
             actions={[
               {
                 handle: () => {
-                  updateLetter(item.Id);
+                  updateLetter(item.Id, 'ACCEPT');
                 },
                 icon: <CheckCircleOutlined/>,
                 label: 'Xác nhận đơn',
                 color: '#4caf50',
+              },
+              {
+                handle: () => {
+                  updateLetter(item.Id, 'DRAFT');
+                },
+                icon: <CloseCircleOutlined />,
+                label: 'Từ chối đơn',
+                color: 'red',
               },
             ]}
           />
@@ -413,7 +424,7 @@ const AttendanceCheckPage = () => {
                     { value: 'ALL', label: 'Tất cả' },
                     { value: 'PENDING', label: 'Chưa duyệt' },
                     { value: 'ACCEPT', label: 'Đã duyệt' },
-                    { value: 'CANCEL', label: 'Từ chối' },
+                    { value: 'DRAFT', label: 'Từ chối' },
                   ]}
                 />
               </Space>
